@@ -1,0 +1,192 @@
+import re
+import time
+import requests
+import smtplib
+import json
+from email.mime.text import MIMEText
+from requests import utils
+
+
+def email(content):
+    # 设置服务器所需信息
+    # qq邮箱服务器地址
+    mail_host = 'smtp.qq.com'
+    # qq用户名
+    mail_user = 'QQ账号'  # 修改
+    # 密码(部分邮箱为授权码)
+    mail_pass = 'QQ邮箱授权码'  # 修改
+    # 邮件发送方邮箱地址
+    sender = '***@qq.com'  # 修改
+    # 邮件接受方邮箱地址，注意需要[]包裹，这意味着你可以写多个邮件地址群发
+    receivers = ['***@qq.com']  # 修改
+
+    # 设置email信息
+    # 邮件内容设置
+    message = MIMEText(content, 'plain', 'utf-8')
+    # 邮件主题'
+    message['Subject'] = '每日疫情自动填报报告'
+    # 发送方信息
+    message['From'] = sender
+    # 接受方信息
+    message['To'] = receivers[0]
+
+    # 登录并发送邮件
+    smtpObj = smtplib.SMTP()
+    # 连接到服务器
+    smtpObj.connect(mail_host, 25)
+    # 登录到服务器
+    smtpObj.login(mail_user, mail_pass)
+    # 发送
+    smtpObj.sendmail(sender, receivers, message.as_string())
+    # 退出
+    smtpObj.quit()
+
+
+url = "https://uis.nwpu.edu.cn/cas/login?service=https%3A%2F%2Fecampus.nwpu.edu.cn%2F%3Fpath%3Dhttps%3A%2F%2Fecampus.nwpu.edu.cn"
+headers = {
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'accept-encoding': 'deflate, br',
+    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+    # 'cache-control': 'max-age=0',
+    'referer': 'https://ecampus.nwpu.edu.cn/main.html',
+    'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Linux"',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-site': 'none',
+    'sec-fetch-user': '?1',
+    'upgrade-insecure-requests': '1',
+    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+}
+session = requests.session()
+try:
+    response = session.get(url, headers=headers)
+except requests.exceptions.ConnectionError as e:
+    email('网络错误，每日疫情自动填报系统无法正常运行，请及时手动填报')
+    exit()
+response.encoding = 'utf-8'
+str1 = re.search('var hmSiteId = "(.*?)"', response.text)
+requests.utils.add_dict_to_cookiejar(session.cookies, {("Hm_lvt_" + str1.group(1)): str(int(time.time()))})
+requests.utils.add_dict_to_cookiejar(session.cookies, {("Hm_lpvt_" + str1.group(1)): str(int(time.time()))})
+execution = re.search('name="execution" value="(.*?)"', response.text)
+
+data = {
+    'username': '翱翔账号',  # 修改
+    'password': '翱翔密码',  # 修改
+    'currentMenu': '1',
+    'execution': execution.group(1),
+    '_eventId': 'submit',
+    'geolocation': '',
+    'submit': 'One moment please...'
+}
+session.post(url, data=data, headers=headers)  # received login coolie
+
+url = 'https://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp'
+session.get(url, headers=headers)
+cookie = 'JSESSIONID=' + session.cookies.get_dict()['JSESSIONID']
+url = 'https://yqtb.nwpu.edu.cn/wx/ry/jrsb_xs.jsp'
+headers = {
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'Accept-Encoding': 'deflate, br',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+    'Connection': 'keep-alive',
+    'Referer': 'https://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp',
+    'Host': 'yqtb.nwpu.edu.cn',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
+    'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Linux"',
+    'Cookie': cookie
+}
+headers2 = {
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Encoding': 'deflate, br',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+    'Connection': 'keep-alive',
+    'Content-Length': '196',
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Host': 'yqtb.nwpu.edu.cn',
+    'Origin': 'https://yqtb.nwpu.edu.cn',
+    'Referer': 'https://yqtb.nwpu.edu.cn/wx/ry/jrsb_xs.jsp',
+    'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Linux"',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
+    'X-Requested-With': 'XMLHttpRequest',
+    'cookie': cookie
+}
+
+# data = {
+#     'hsjc': '1',
+#     'xasymt': '1',
+#     'actionType': 'addRbxx',
+#     'userLoginId': '学号',  # 修改
+#     'szcsbm': '1',
+#     'bdzt': '1',
+#     'szcsmc': '在学校',
+#     'sfyzz': '0',
+#     'sfqz': '0',
+#     'tbly': 'sso',
+#     'qtqksm': '',
+#     'ycqksm': '',
+#     'userType': '2',
+#     'userName': '姓名',  # 修改
+# }  # 这个data是在学校的版本，如果你像我一样在省外，应使用下面的data
+
+data = {
+    'hsjc': '1',
+    'sfczbcqca': '',
+    'czbcqcasjd': '',
+    'sfczbcfhyy': '',
+    'czbcfhyysjd': '',
+    'actionType': 'addRbxx',
+    'userLoginId': '学号',  # 修改
+    'userName': '姓名',  # 修改
+    'szcsbm': '省份证前6位',  # 修改
+    'szcsmc': '**省**市*县（参考手动填报时的地址）',  # 修改
+    'sfjt': '0',
+    'sfjtsm': '',
+    'sfjcry': '0',
+    'sfjcrysm': '',
+    'sfjcqz': '0',
+    'sfyzz': '0',
+    'sfqz': '0',
+    'ycqksm': '',
+    'glqk': '0',
+    'glksrq': '',
+    'gljsrq': '',
+    'tbly': 'sso',
+    'glyy': '',
+    'qtqksm': '',
+    'sfjcqzsm': '',
+    'sfjkqk': '0',
+    'jkqksm': '',
+    'sfmtbg': '',
+    'userType': '2',
+    'qrlxzt': '3',
+    'bdzt': '1',
+    'xymc': '大类/专业，如航空航天类',  # 修改
+    'xssjhm': '翱翔账号',  # 修改
+}
+
+response = session.get(url, headers=headers)
+response.encoding = 'utf-8'
+match = re.search(r"url:'(.*?)'", response.text)
+if match is None:
+    email("cookie失效")
+else:
+    url2 = r"https://yqtb.nwpu.edu.cn/wx/ry/" + match.group(1)
+    response = requests.post(url2, data=data, headers=headers2)
+    response.encoding = 'utf-8'
+    if response.text[-3] != '1':
+        email("自动填报失败")
+    print(response.text)
