@@ -43,25 +43,9 @@ def email(content):
 
 
 url = "https://uis.nwpu.edu.cn/cas/login?service=https%3A%2F%2Fecampus.nwpu.edu.cn%2F%3Fpath%3Dhttps%3A%2F%2Fecampus.nwpu.edu.cn"
-headers = {
-    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-    'accept-encoding': 'deflate, br',
-    'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-    # 'cache-control': 'max-age=0',
-    'referer': 'https://ecampus.nwpu.edu.cn/main.html',
-    'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Linux"',
-    'sec-fetch-dest': 'document',
-    'sec-fetch-mode': 'navigate',
-    'sec-fetch-site': 'none',
-    'sec-fetch-user': '?1',
-    'upgrade-insecure-requests': '1',
-    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
-}
 session = requests.session()
 try:
-    response = session.get(url, headers=headers)
+    response = session.get(url)
 except requests.exceptions.ConnectionError as e:
     email('网络错误，每日疫情自动填报系统无法正常运行，请及时手动填报')
     exit()
@@ -80,67 +64,42 @@ data = {
     'geolocation': '',
     'submit': 'One moment please...'
 }
-session.post(url, data=data, headers=headers)  # received login coolie
+session.post(url, data=data)  # received login coolie
 
-url = 'https://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp'
-session.get(url, headers=headers)
-cookie = 'JSESSIONID=' + session.cookies.get_dict()['JSESSIONID']
-url = 'https://yqtb.nwpu.edu.cn/wx/ry/jrsb_xs.jsp'
-headers = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-    'Accept-Encoding': 'deflate, br',
-    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-    'Connection': 'keep-alive',
-    'Referer': 'https://yqtb.nwpu.edu.cn/wx/xg/yz-mobile/index.jsp',
-    'Host': 'yqtb.nwpu.edu.cn',
-    'Sec-Fetch-Dest': 'document',
-    'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'same-origin',
-    'Sec-Fetch-User': '?1',
-    'Upgrade-Insecure-Requests': '1',
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
-    'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Linux"',
-    'Cookie': cookie
-}
+url = 'https://yqtb.nwpu.edu.cn/sso/login.jsp'
+for __ in range(3):
+    try:
+        response = session.get(url)
+    except requests.exceptions.ConnectionError as e:
+        time.sleep(5)
+    else:
+        break
+
 headers2 = {
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Accept-Encoding': 'deflate, br',
-    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
-    'Connection': 'keep-alive',
-    'Content-Length': '196',
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'Host': 'yqtb.nwpu.edu.cn',
-    'Origin': 'https://yqtb.nwpu.edu.cn',
     'Referer': 'https://yqtb.nwpu.edu.cn/wx/ry/jrsb_xs.jsp',
-    'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Linux"',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin',
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
     'X-Requested-With': 'XMLHttpRequest',
-    'cookie': cookie
 }
 
-# data = {
-#     'hsjc': '1',
-#     'xasymt': '1',
-#     'actionType': 'addRbxx',
-#     'userLoginId': '学号',  # 修改
-#     'szcsbm': '1',
-#     'bdzt': '1',
-#     'szcsmc': '在学校',
-#     'sfyzz': '0',
-#     'sfqz': '0',
-#     'tbly': 'sso',
-#     'qtqksm': '',
-#     'ycqksm': '',
-#     'userType': '2',
-#     'userName': '姓名',  # 修改
-# }  # 这个data是在学校的版本，如果你像我一样在省外，应使用下面的data
+data = {
+    'hsjc': '1',
+    'xasymt': '1',
+    'actionType': 'addRbxx',
+    'userLoginId': '2021300356',
+    'szcsbm': '1',
+    'bdzt': '1',
+    'szcsmc': '在学校',
+    'szcsmc1': '在学校',
+    'sfyzz': '0',
+    'sfqz': '0',
+    'tbly': 'pc',
+    'qtqksm': '',
+    'ycqksm': '',
+    'sfxn': '0',
+    'sfdw': '0',
+    'longlat': '',
+    'userType': '2',
+    'userName': '黄俊霖',
+}  # 这个data是在学校的版本，如果你在省外，应使用下面的data
 
 data = {
     'hsjc': '1',
@@ -178,15 +137,19 @@ data = {
     'xssjhm': '翱翔账号',  # 修改
 }
 
-response = session.get(url, headers=headers)
 response.encoding = 'utf-8'
-match = re.search(r"url:'(.*?)'", response.text)
+match = re.findall(r"url:'(.*?)'", response.text)
 if match is None:
     email("cookie失效")
 else:
-    url2 = r"https://yqtb.nwpu.edu.cn/wx/ry/" + match.group(1)
-    response = requests.post(url2, data=data, headers=headers2)
+    url2 = r"https://yqtb.nwpu.edu.cn/wx/ry/" + match[3]
+    for __ in range(3):
+        try:
+            response = session.post(url2, data=data, headers=headers2)
+        except requests.exceptions.ConnectionError as e:
+            time.sleep(5)
+        else:
+            break
     response.encoding = 'utf-8'
     if response.text[-3] != '1':
         email("自动填报失败")
-    print(response.text)
