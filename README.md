@@ -30,3 +30,5 @@
 3. 使用该脚本前，你需在此之上添加部分个人信息，并修改部分文件路径，需修改处已注释提醒
 # AutoFill
 自动健康打卡的Windows Qt版，基于Python开发
+# AutoFill_for_Android
+自动健康打卡的Android版，基于Kotlin
