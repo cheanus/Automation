@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">AutoFill</string>
+    <string name="service_text"><Data><![CDATA[
+        AutoFill使用协议\n
+        1. 您必须同意本协议，方可使用本软件所提供的服务。如勾选”我同意以上使用协议“，视为您同意本协议的所有内容。\n
+        2. 您应当在不修改本软件代码的条件下使用本软件，使用盗版软件的后果与本软件开发者无关。\n
+        3. 您应当知晓并承担使用本软件的一切风险，如提交错误健康信息、软件打卡失败等风险。\n
+        4. 本软件不可替代校方提供的打卡渠道，应始终作为您的辅助工具使用。\n
+        5. 您应当在使用本软件时遵守相关法律法规及学校规定。\n
+        6. 本软件仅在本地加密存储您的账号及密码，并仅用于自动打卡时登录学校账户完成打卡。本软件不会将您的敏感信息提供给第三方。\n
+        7. 软件每次打卡前，您应始终核实自己的健康状况、打卡信息是否准确。如出现您的健康状况、打卡信息发生变化，
+        或本软件与法律法规及学校规定冲突，或您不再接受本服务条款等情况，请立即停止使用本软件！\n
+        8. 本软件的使用选择权完全归使用者所有，一切使用后果归使用方负责，开发者不承担您违规使用所造成的任何责任！\n
+    ]]></Data></string>
+    <string name="help_text"><Data><![CDATA[
+        AutoFill帮助\n\n
+        注意：目前app仅支持校内打卡功能\n
+        步骤：\n
+        1. 设置账户，输入翱翔门户的账号和密码。\n
+        2. 保存账户后点击“测试”，一切正常则提示打卡成功。\n
+        3. 设置打卡时间。\n
+        4. 返回主页面点击“开始打卡”。
+        5. 在手机设置里为“AutoFill"设置开机/后台自启动和后台运行的权限。\n
+    ]]></Data></string>
+    <string name="allow_reminder">我同意以上使用协议</string>
+    <string name="start_use">开始使用</string>
+    <string name="npwu_icon">西瓜大图标</string>
+    <string name="fill_off">关闭打卡</string>
+    <string name="fill_on">开始打卡</string>
+    <string name="nwpu_account">翱翔账户</string>
+    <string name="account_reminder">账号:</string>
+    <string name="account_hint">请输入用户名/手机/邮箱/证件号</string>
+    <string name="password_reminder">密码:</string>
+    <string name="password_hint">请输入密码</string>
+    <string name="save_text">保存</string>
+    <string name="test_text">测试</string>
+    <string name="plan_time">打卡时间</string>
+    <string name="reference">关于</string>
+    <string name="autofill_v1_0">AutoFill v1.0</string>
+    <string name="back">返回</string>
+    <string name="use_policy">使用协议</string>
+</resources>
