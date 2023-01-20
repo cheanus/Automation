@@ -28,7 +28,3 @@
 2. 推荐使用搭载Linux的云服务器，参考我的博客链接：[来做个“成绩实时监控系统”吧
 ](https://caveallegory.cn/2022/07/%e6%9d%a5%e5%81%9a%e4%b8%aa%e6%88%90%e7%bb%a9%e5%ae%9e%e6%97%b6%e7%9b%91%e6%8e%a7%e7%b3%bb%e7%bb%9f%e5%90%a7/)
 3. 使用该脚本前，你需在此之上添加部分个人信息，并修改部分文件路径，需修改处已注释提醒
-# AutoFill
-自动健康打卡的Windows Qt版，基于Python开发
-# AutoFill_for_Android
-自动健康打卡的Android版，基于Kotlin
