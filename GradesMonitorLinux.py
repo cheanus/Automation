@@ -1,12 +1,14 @@
-import imaplib
+import os
 import re
+import rsa
 import time
 import json
 import email
-import os
+import base64
+import imaplib
 import smtplib
-from email.mime.text import MIMEText
 import requests
+from email.mime.text import MIMEText
 
 
 ## 部署个人信息
@@ -89,6 +91,12 @@ else:
         ("Hm_lpvt_" + str1.group(1)): str(int(time.time()))
     }
     session.cookies.update(new_cookies)
+    # RSA加密password
+    URL_key = 'https://uis.nwpu.edu.cn/cas/jwt/publicKey'
+    public_key = session.get(URL_key, headers=headers2).text
+    public_key = rsa.PublicKey.load_pkcs1_openssl_pem(public_key.encode())
+    password = rsa.encrypt(password.encode(), public_key)
+    password = "__RSA__" + base64.b64encode(password).decode()
 
 if len(response.history) == 0:
     #  没有重定向到主页，开始输入账号
