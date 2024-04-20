@@ -1,6 +1,7 @@
-import requests
 import re
+import json
 import smtplib
+import requests
 from email.mime.text import MIMEText
 
 ## 部署个人信息
@@ -15,6 +16,15 @@ mail_pass = '****************'
 sender = '***@qq.com'
 # 邮件接受方邮箱地址，注意需要[]包裹，这意味着你可以写多个邮件地址群发
 receivers = ['***@qq.com']
+## 宿舍房间信息，参照APP-电费里的文字填写
+# 校区
+campus = '长安校区'
+# 楼栋
+building = '云天苑C座右'
+# 房间
+room = '云天苑C座右-1-128'
+# 剩余电量提醒阈值
+threshold = 20.0
 
 def email_msg(title: str, content: str) -> None:
     # 设置email信息
@@ -53,15 +63,47 @@ headers = {
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
 }
+
+# 查找宿舍对应代码
+campus_code = '22' if campus == '长安校区' else '1'
+data = {
+    'type': 'select',
+    'level': '1',
+    'campus': campus_code,
+    'feeitemid': '182'
+}
+response = requests.post(URL, data=data, headers=headers)
+building_code = -1
+for building_item in json.loads(response.text)['map']['data']:
+    if building_item['name'] == building:
+        building_code = building_item['value']
+        break
+data = {
+    'type': 'select',
+    'level': '2',
+    'campus': campus_code,
+    'building': building_code,
+    'feeitemid': '182'
+}
+response = requests.post(URL, data=data, headers=headers)
+room_code = -1
+for room_item in json.loads(response.text)['map']['data']:
+    if room_item['name'] == room:
+        room_code = room_item['value']
+        break
+if building_code == -1 or room_code == -1:
+    raise ValueError('未找到对应房间')
+
 data = {
     'type': 'IEC',
     'level': '3',
-    'campus': '22',
-    'building': 'ul001002001026',
-    'room': 'c1d2f50ab87d49db9d622693b762fcf2',
+    'campus': campus_code,
+    'building': building_code,
+    'room': room_code,
     'feeitemid': '182'
 }
 response = requests.post(URL, data=data, headers=headers)
 remain = re.search(r'当前剩余电量\\":\\"(.*?)\\', response.text).groups()[0]
-if float(remain) < 20.0:
+# print('当前电费为：'+remain)
+if float(remain) < threshold:
     email_msg('宿舍电费提醒', '当前电费为：'+remain+'，请尽快缴费')
