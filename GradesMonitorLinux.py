@@ -126,7 +126,7 @@ if len(response.history) == 0:
     code = conn.login(sender, mail_pass)
 
     for _ in range(3):
-        time.sleep(7)
+        time.sleep(12)
         conn.select()
         typ, data1 = conn.search(None, '(FROM "portal@nwpu.edu.cn")')
         try:
