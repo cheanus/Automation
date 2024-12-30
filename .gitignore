@@ -1,1 +1,4 @@
-auto_fill_linux
+config.py
+cookies.json
+grades.csv
+__pycache__/
