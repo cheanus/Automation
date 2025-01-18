@@ -52,10 +52,8 @@ def email_msg(title: str, content: str) -> None:
     # 接受方信息
     message["To"] = receivers[0]
 
-    # 登录并发送邮件
-    smtp_obj = smtplib.SMTP()
-    # 连接到服务器
-    smtp_obj.connect(mail_host, 25)
+    # 初始化邮箱服务器
+    smtp_obj = smtplib.SMTP_SSL(mail_host, 465)
     # 登录到服务器
     smtp_obj.login(mail_user, mail_pass)
     # 发送
